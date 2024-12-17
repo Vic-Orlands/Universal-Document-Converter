@@ -16,6 +16,8 @@ import { useToast } from "@/hooks/use-toast";
 import showdown from "showdown";
 import Papa from "papaparse";
 
+type CsvRow = Record<string, string>;
+
 export default function AdvancedConverter() {
   const { toast } = useToast();
   const [copy, setCopy] = useState<boolean>(false);
@@ -49,7 +51,7 @@ export default function AdvancedConverter() {
 
   function convertCsvToMarkdown(csvText: string) {
     try {
-      const results = Papa.parse(csvText, { header: true });
+      const results = Papa.parse<CsvRow>(csvText, { header: true });
 
       if (!results.data.length) {
         throw new Error("No data found in CSV");
@@ -122,9 +124,10 @@ export default function AdvancedConverter() {
       const parser = new DOMParser();
       const xmlDoc = parser.parseFromString(xmlText, "text/xml");
 
-      function xmlToJson(xml: Element): any {
+      function xmlToJson(xml: Element) {
         // Create the return object
-        let obj: any = {};
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const obj: any = {};
 
         if (xml.nodeType === 1) {
           // element
@@ -139,6 +142,8 @@ export default function AdvancedConverter() {
             }
           }
         }
+
+        console.log(typeof obj, obj);
 
         // do children
         if (xml.hasChildNodes()) {
